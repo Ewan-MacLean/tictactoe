@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+// creating the square element (functional)
+// is now called under the react element 'Square'
 function Square(props) {
     return (
         <button className='square' onClick={props.onClick}>
@@ -10,7 +12,7 @@ function Square(props) {
     )
 }
   
-  class Board extends React.Component {
+class Board extends React.Component {
     // slice() creates a copy of the squares array
     // we can either mutate the original array, or create a new one
     // *** you will almost always want to use immutable arrays over mutatble!! ***
@@ -22,11 +24,15 @@ function Square(props) {
     
     // The square components are now controlled components
     
+    // create the rendersquare method that will 
+    // contain a click event
     renderSquare(i) {
         return <Square value={this.props.squares[i]}
         onClick={()=> this.props.onClick(i)} />;
     }
     
+    // now render the board by calling the renderSquare
+    // method for each row in the board
     render() {
         
         return (
@@ -52,10 +58,19 @@ function Square(props) {
     }
 }
 
+// the 'Game' element we are creating here is 
+// the results of the game that are saved and 
+// then used in the time-travel feature as well as 
+// displaying the winner
+
 class Game extends React.Component {
 
     constructor(props) {
+      //  You can’t use 'this' in a constructor until after you’ve called the parent constructor.
+      // In this case, it is used to call the 'props' from React.Component
         super(props)
+        // the state of the game is an object containing
+        // properties from the current game
         this.state = {
             history: [{
                 squares: Array(9).fill(null)
@@ -63,6 +78,7 @@ class Game extends React.Component {
             stepNumber: 0,
             xIsNext: true
         }
+        // now the props of the game component contains the current game state information
     }
 
     handleClick(i) {
@@ -94,21 +110,27 @@ class Game extends React.Component {
         })
     }
 
+    // present the results of the game
+    // as well as the time-travel feature
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber]
         const winner = calculateWinner(current.squares);
 
+        // for each move in the history of moves,
+        // create a JSX element that contains a button 
+        // that will JUMP TO the selected STATE in the
+        // GAME react element
         const moves = history.map((step,move) => {
-            const desc = move ?
-            'Go to move #' + move :
-            'Go to game start'
-          return (
-              <li key={move}>
-                  <button onClick={()=> this.jumpTo(move)}>{desc}</button>
-              </li>
-          )
-        })
+              const desc = move ?
+              'Go to move #' + move :
+              'Go to game start'
+            return (
+                <li key={move}>
+                    <button onClick={()=> this.jumpTo(move)}>{desc}</button>
+                </li>
+            )
+          })
         let status;
         if (winner) {
           status = 'Winner: ' + winner;
@@ -124,6 +146,10 @@ class Game extends React.Component {
                 />
           </div>
           <div className="game-info">
+             {/* the STATUS and MOVES are strings that are called 
+                as variables that are subject to change depending on
+                the state of the game.
+                This changes every re-render */}
             <div>{status}</div>
             <ol>{moves}</ol>
           </div>
@@ -132,7 +158,8 @@ class Game extends React.Component {
     }
   }
 
-  function calculateWinner(squares) {
+  // all possible winning lines
+function calculateWinner(squares) {
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -143,6 +170,8 @@ class Game extends React.Component {
       [0, 4, 8],
       [2, 4, 6],
     ];
+    // for each winning combination, check if it is present in the current game board. 
+    // runs every time the board is re-rendered
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
@@ -150,7 +179,7 @@ class Game extends React.Component {
       }
     }
     return null;
-  }
+}
   
   // ========================================
   
